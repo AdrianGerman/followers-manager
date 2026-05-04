@@ -3,11 +3,13 @@ import { mockFollowers } from "./data/followers"
 import StatsBar from "./components/StatsBar"
 import FollowerCard from "./components/FollowerCard"
 import FollowerRow from "./components/FollowerRow"
+import FollowerModal from "./components/FollowerModal"
 
 export default function App() {
   const [followers] = useState(mockFollowers)
   const [search, setSearch] = useState("")
   const [view, setView] = useState("grid")
+  const [selected, setSelected] = useState(null)
 
   const filtered = followers.filter((f) =>
     f.username.toLowerCase().includes(search.toLowerCase()),
@@ -19,7 +21,7 @@ export default function App() {
         <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
           Followers Manager
         </h1>
-        <span className="text-xs text-zinc-600 tracking-wider">v0.3.0</span>
+        <span className="text-xs text-zinc-600 tracking-wider">v0.4.0</span>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
@@ -60,7 +62,7 @@ export default function App() {
             }}
           >
             {filtered.map((f) => (
-              <FollowerCard key={f.id} follower={f} onClick={() => {}} />
+              <FollowerCard key={f.id} follower={f} onClick={setSelected} />
             ))}
           </div>
         )}
@@ -68,7 +70,7 @@ export default function App() {
         {view === "list" && (
           <div className="flex flex-col gap-2">
             {filtered.map((f) => (
-              <FollowerRow key={f.id} follower={f} onClick={() => {}} />
+              <FollowerRow key={f.id} follower={f} onClick={setSelected} />
             ))}
           </div>
         )}
@@ -79,6 +81,8 @@ export default function App() {
           </p>
         )}
       </main>
+
+      <FollowerModal follower={selected} onClose={() => setSelected(null)} />
     </div>
   )
 }
