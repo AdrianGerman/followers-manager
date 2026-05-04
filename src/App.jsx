@@ -6,7 +6,7 @@ import FollowerRow from "./components/FollowerRow"
 import FollowerModal from "./components/FollowerModal"
 
 export default function App() {
-  const [followers] = useState(mockFollowers)
+  const [followers, setFollowers] = useState(mockFollowers)
   const [search, setSearch] = useState("")
   const [view, setView] = useState("grid")
   const [selected, setSelected] = useState(null)
@@ -15,13 +15,17 @@ export default function App() {
     f.username.toLowerCase().includes(search.toLowerCase()),
   )
 
+  function handleSave(updated) {
+    setFollowers((prev) => prev.map((f) => (f.id === updated.id ? updated : f)))
+  }
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-900 px-6 h-14 flex items-center justify-between">
         <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
           Followers Manager
         </h1>
-        <span className="text-xs text-zinc-600 tracking-wider">v0.4.0</span>
+        <span className="text-xs text-zinc-600 tracking-wider">v0.5.0</span>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
@@ -35,7 +39,6 @@ export default function App() {
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
           />
-
           <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shrink-0">
             <ViewBtn
               active={view === "grid"}
@@ -48,7 +51,6 @@ export default function App() {
               label="Lista"
             />
           </div>
-
           <span className="text-xs text-zinc-600 whitespace-nowrap">
             {filtered.length} resultado{filtered.length !== 1 && "s"}
           </span>
@@ -82,7 +84,11 @@ export default function App() {
         )}
       </main>
 
-      <FollowerModal follower={selected} onClose={() => setSelected(null)} />
+      <FollowerModal
+        follower={selected}
+        onClose={() => setSelected(null)}
+        onSave={handleSave}
+      />
     </div>
   )
 }
