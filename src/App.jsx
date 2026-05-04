@@ -1,8 +1,15 @@
 import { useState } from "react"
 import { mockFollowers } from "./data/followers"
+import StatsBar from "./components/StatsBar"
+import FollowerCard from "./components/FollowerCard"
 
 export default function App() {
   const [followers] = useState(mockFollowers)
+  const [search, setSearch] = useState("")
+
+  const filtered = followers.filter((f) =>
+    f.username.toLowerCase().includes(search.toLowerCase()),
+  )
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -10,13 +17,41 @@ export default function App() {
         <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
           Followers Manager
         </h1>
-        <span className="text-xs text-zinc-600 tracking-wider">v0.1.0</span>
+        <span className="text-xs text-zinc-600 tracking-wider">v0.2.0</span>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <p className="text-zinc-500 text-sm">
-          {followers.length} seguidores cargados. UI en el siguiente commit.
-        </p>
+        <StatsBar followers={followers} />
+
+        <div className="flex gap-3 mb-5 items-center">
+          <input
+            type="text"
+            placeholder="Buscar seguidor..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
+          />
+          <span className="text-xs text-zinc-600 whitespace-nowrap">
+            {filtered.length} resultado{filtered.length !== 1 && "s"}
+          </span>
+        </div>
+
+        <div
+          className="grid gap-3"
+          style={{
+            gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+          }}
+        >
+          {filtered.map((f) => (
+            <FollowerCard key={f.id} follower={f} onClick={() => {}} />
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <p className="text-center text-zinc-600 text-sm py-16">
+            Sin resultados para &quot;{search}&quot;
+          </p>
+        )}
       </main>
     </div>
   )
