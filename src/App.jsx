@@ -2,10 +2,12 @@ import { useState } from "react"
 import { mockFollowers } from "./data/followers"
 import StatsBar from "./components/StatsBar"
 import FollowerCard from "./components/FollowerCard"
+import FollowerRow from "./components/FollowerRow"
 
 export default function App() {
   const [followers] = useState(mockFollowers)
   const [search, setSearch] = useState("")
+  const [view, setView] = useState("grid")
 
   const filtered = followers.filter((f) =>
     f.username.toLowerCase().includes(search.toLowerCase()),
@@ -17,7 +19,7 @@ export default function App() {
         <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
           Followers Manager
         </h1>
-        <span className="text-xs text-zinc-600 tracking-wider">v0.2.0</span>
+        <span className="text-xs text-zinc-600 tracking-wider">v0.3.0</span>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
@@ -31,21 +33,45 @@ export default function App() {
             onChange={(e) => setSearch(e.target.value)}
             className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
           />
+
+          <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden shrink-0">
+            <ViewBtn
+              active={view === "grid"}
+              onClick={() => setView("grid")}
+              label="Grid"
+            />
+            <ViewBtn
+              active={view === "list"}
+              onClick={() => setView("list")}
+              label="Lista"
+            />
+          </div>
+
           <span className="text-xs text-zinc-600 whitespace-nowrap">
             {filtered.length} resultado{filtered.length !== 1 && "s"}
           </span>
         </div>
 
-        <div
-          className="grid gap-3"
-          style={{
-            gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-          }}
-        >
-          {filtered.map((f) => (
-            <FollowerCard key={f.id} follower={f} onClick={() => {}} />
-          ))}
-        </div>
+        {view === "grid" && (
+          <div
+            className="grid gap-3"
+            style={{
+              gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+            }}
+          >
+            {filtered.map((f) => (
+              <FollowerCard key={f.id} follower={f} onClick={() => {}} />
+            ))}
+          </div>
+        )}
+
+        {view === "list" && (
+          <div className="flex flex-col gap-2">
+            {filtered.map((f) => (
+              <FollowerRow key={f.id} follower={f} onClick={() => {}} />
+            ))}
+          </div>
+        )}
 
         {filtered.length === 0 && (
           <p className="text-center text-zinc-600 text-sm py-16">
@@ -54,5 +80,20 @@ export default function App() {
         )}
       </main>
     </div>
+  )
+}
+
+function ViewBtn({ active, onClick, label }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 text-xs font-medium transition-colors cursor-pointer ${
+        active
+          ? "bg-violet-600/20 text-violet-400"
+          : "text-zinc-500 hover:text-zinc-300"
+      }`}
+    >
+      {label}
+    </button>
   )
 }
