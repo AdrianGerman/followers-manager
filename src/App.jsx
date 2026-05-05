@@ -1,12 +1,13 @@
 import { useState } from "react"
 import { mockFollowers } from "./data/followers"
+import { useLocalStorage } from "./hooks/useLocalStorage"
 import StatsBar from "./components/StatsBar"
 import FollowerCard from "./components/FollowerCard"
 import FollowerRow from "./components/FollowerRow"
 import FollowerModal from "./components/FollowerModal"
 
 export default function App() {
-  const [followers, setFollowers] = useState(mockFollowers)
+  const [followers, setFollowers] = useLocalStorage("followers", mockFollowers)
   const [search, setSearch] = useState("")
   const [view, setView] = useState("grid")
   const [selected, setSelected] = useState(null)
