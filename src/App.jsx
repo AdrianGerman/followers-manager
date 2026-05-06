@@ -1,20 +1,40 @@
 import { useState } from "react"
-import { mockFollowers } from "./data/followers"
+import { mockFollowers, ROLES } from "./data/followers"
 import { useLocalStorage } from "./hooks/useLocalStorage"
 import StatsBar from "./components/StatsBar"
 import FollowerCard from "./components/FollowerCard"
 import FollowerRow from "./components/FollowerRow"
 import FollowerModal from "./components/FollowerModal"
 
+const FILTERS = [
+  { label: "Todos", value: "all" },
+  { label: "Seguidores", value: ROLES.FOLLOWER },
+  { label: "Moderadores", value: ROLES.MODERATOR },
+]
+
+const SORTS = [
+  { label: "Más antiguos", value: "asc" },
+  { label: "Más recientes", value: "desc" },
+  { label: "Nombre A–Z", value: "az" },
+]
+
 export default function App() {
   const [followers, setFollowers] = useLocalStorage("followers", mockFollowers)
   const [search, setSearch] = useState("")
   const [view, setView] = useState("grid")
+  const [filter, setFilter] = useState("all")
+  const [sort, setSort] = useState("asc")
   const [selected, setSelected] = useState(null)
 
-  const filtered = followers.filter((f) =>
-    f.username.toLowerCase().includes(search.toLowerCase()),
-  )
+  const filtered = followers
+    .filter((f) => filter === "all" || f.role === filter)
+    .filter((f) => f.username.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => {
+      if (sort === "az") return a.username.localeCompare(b.username)
+      if (sort === "desc")
+        return new Date(b.followedAt) - new Date(a.followedAt)
+      return new Date(a.followedAt) - new Date(b.followedAt)
+    })
 
   function handleSave(updated) {
     setFollowers((prev) => prev.map((f) => (f.id === updated.id ? updated : f)))
@@ -26,13 +46,13 @@ export default function App() {
         <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
           Followers Manager
         </h1>
-        <span className="text-xs text-zinc-600 tracking-wider">v0.5.0</span>
+        <span className="text-xs text-zinc-600 tracking-wider">v0.7.0</span>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
         <StatsBar followers={followers} />
 
-        <div className="flex gap-3 mb-5 items-center">
+        <div className="flex gap-3 mb-3 items-center">
           <input
             type="text"
             placeholder="Buscar seguidor..."
@@ -52,7 +72,35 @@ export default function App() {
               label="Lista"
             />
           </div>
-          <span className="text-xs text-zinc-600 whitespace-nowrap">
+        </div>
+
+        <div className="flex gap-2 mb-6 items-center flex-wrap">
+          <div className="flex gap-1.5">
+            {FILTERS.map((f) => (
+              <FilterPill
+                key={f.value}
+                active={filter === f.value}
+                onClick={() => setFilter(f.value)}
+                label={f.label}
+              />
+            ))}
+          </div>
+
+          <div className="w-px h-4 bg-zinc-800 mx-1" />
+
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value)}
+            className="bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-zinc-400 outline-none focus:border-violet-500 transition-colors cursor-pointer"
+          >
+            {SORTS.map((s) => (
+              <option key={s.value} value={s.value}>
+                {s.label}
+              </option>
+            ))}
+          </select>
+
+          <span className="text-xs text-zinc-600 ml-auto whitespace-nowrap">
             {filtered.length} resultado{filtered.length !== 1 && "s"}
           </span>
         </div>
@@ -80,7 +128,7 @@ export default function App() {
 
         {filtered.length === 0 && (
           <p className="text-center text-zinc-600 text-sm py-16">
-            Sin resultados para &quot;{search}&quot;
+            Sin resultados
           </p>
         )}
       </main>
@@ -102,6 +150,21 @@ function ViewBtn({ active, onClick, label }) {
         active
           ? "bg-violet-600/20 text-violet-400"
           : "text-zinc-500 hover:text-zinc-300"
+      }`}
+    >
+      {label}
+    </button>
+  )
+}
+
+function FilterPill({ active, onClick, label }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer ${
+        active
+          ? "bg-violet-600/20 border-violet-500/60 text-violet-400"
+          : "bg-transparent border-zinc-800 text-zinc-500 hover:text-zinc-300 hover:border-zinc-600"
       }`}
     >
       {label}
