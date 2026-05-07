@@ -4,7 +4,7 @@ import { ROLES } from "../data/followers"
 import Avatar from "./Avatar"
 import { RoleBadge } from "./FollowerRow"
 
-export default function FollowerModal({ follower, onClose, onSave }) {
+export default function FollowerModal({ follower, onClose, onSave, onRemove }) {
   if (!follower) return null
 
   return (
@@ -16,14 +16,20 @@ export default function FollowerModal({ follower, onClose, onSave }) {
         onClick={(e) => e.stopPropagation()}
         className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto"
       >
-        <ModalContent follower={follower} onClose={onClose} onSave={onSave} />
+        <ModalContent
+          follower={follower}
+          onClose={onClose}
+          onSave={onSave}
+          onRemove={onRemove}
+        />
       </div>
     </div>
   )
 }
 
-function ModalContent({ follower, onClose, onSave }) {
+function ModalContent({ follower, onClose, onSave, onRemove }) {
   const [editing, setEditing] = useState(false)
+  const [confirming, setConfirming] = useState(false)
 
   const [role, setRole] = useState(follower.role)
   const [notes, setNotes] = useState(follower.notes)
@@ -62,6 +68,11 @@ function ModalContent({ follower, onClose, onSave }) {
 
   function removeAlias(index) {
     setAliases(aliases.filter((_, i) => i !== index))
+  }
+
+  function handleRemove() {
+    onRemove(follower.id)
+    onClose()
   }
 
   return (
@@ -133,7 +144,7 @@ function ModalContent({ follower, onClose, onSave }) {
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="¿Por qué añadiste a este seguidor? ¿Algo importante?"
+              placeholder="¿Por qué añadiste a este seguidor?"
               rows={3}
               className="mt-2 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors resize-none"
             />
@@ -150,7 +161,6 @@ function ModalContent({ follower, onClose, onSave }) {
 
         <div>
           <Label>Alias en juegos</Label>
-
           {aliases.length > 0 ? (
             <ul className="mt-2 flex flex-col gap-1.5">
               {aliases.map((a, i) => (
@@ -232,6 +242,42 @@ function ModalContent({ follower, onClose, onSave }) {
                 Guardar
               </button>
             </div>
+          </>
+        )}
+
+        {!editing && (
+          <>
+            <Divider />
+            {confirming ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-xs text-zinc-500 text-center">
+                  ¿Eliminar a{" "}
+                  <span className="text-zinc-300 font-medium">{username}</span>?
+                  Esto no se puede deshacer.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setConfirming(false)}
+                    className="flex-1 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-100 text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={handleRemove}
+                    className="flex-1 py-2 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirming(true)}
+                className="w-full py-2 rounded-lg bg-transparent hover:bg-red-500/10 border border-zinc-800 hover:border-red-500/40 text-zinc-600 hover:text-red-400 text-sm font-medium transition-colors cursor-pointer"
+              >
+                Eliminar seguidor
+              </button>
+            )}
           </>
         )}
       </div>

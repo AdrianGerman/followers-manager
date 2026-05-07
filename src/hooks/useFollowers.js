@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import { mockFollowers, ROLES } from "../data/followers"
+import { mockFollowers } from "../data/followers"
 import { useLocalStorage } from "./useLocalStorage"
 
 export function useFollowers() {
@@ -9,5 +8,13 @@ export function useFollowers() {
     setFollowers((prev) => prev.map((f) => (f.id === updated.id ? updated : f)))
   }
 
-  return { followers, saveFollower }
+  function addFollower(newFollower) {
+    setFollowers((prev) => [...prev, newFollower])
+  }
+
+  function removeFollower(id) {
+    setFollowers((prev) => prev.filter((f) => f.id !== id))
+  }
+
+  return { followers, saveFollower, addFollower, removeFollower }
 }

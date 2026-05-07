@@ -6,9 +6,11 @@ import Toolbar from "./components/Toolbar"
 import FollowerGrid from "./components/FollowerGrid"
 import FollowerList from "./components/FollowerList"
 import FollowerModal from "./components/FollowerModal"
+import AddFollowerModal from "./components/AddFollowerModal"
 
 export default function App() {
-  const { followers, saveFollower } = useFollowers()
+  const { followers, saveFollower, addFollower, removeFollower } =
+    useFollowers()
   const {
     filtered,
     search,
@@ -22,6 +24,7 @@ export default function App() {
   } = useFilteredFollowers(followers)
 
   const [selected, setSelected] = useState(null)
+  const [adding, setAdding] = useState(false)
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -29,7 +32,12 @@ export default function App() {
         <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
           Followers Manager
         </h1>
-        <span className="text-xs text-zinc-600 tracking-wider">v0.8.0</span>
+        <button
+          onClick={() => setAdding(true)}
+          className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+        >
+          + Añadir
+        </button>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
@@ -65,7 +73,15 @@ export default function App() {
         follower={selected}
         onClose={() => setSelected(null)}
         onSave={saveFollower}
+        onRemove={removeFollower}
       />
+
+      {adding && (
+        <AddFollowerModal
+          onClose={() => setAdding(false)}
+          onAdd={addFollower}
+        />
+      )}
     </div>
   )
 }
