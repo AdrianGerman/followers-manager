@@ -14,7 +14,7 @@ export default function FollowerModal({ follower, onClose, onSave, onRemove }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto"
+        className="hide-scrollbar bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto"
       >
         <ModalContent
           follower={follower}
@@ -77,6 +77,7 @@ function ModalContent({ follower, onClose, onSave, onRemove }) {
 
   return (
     <>
+      {/* Banner + avatar */}
       <div className="relative bg-zinc-800 h-20">
         <div className="absolute bottom-0 left-6 translate-y-1/2">
           <Avatar username={username} avatar={avatar} size={72} />
