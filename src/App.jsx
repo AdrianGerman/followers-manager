@@ -1,15 +1,17 @@
 import { useState } from "react"
 import { useFollowers } from "./hooks/useFollowers"
 import { useFilteredFollowers } from "./hooks/useFilteredFollowers"
+import { usePorter } from "./hooks/usePorter"
 import StatsBar from "./components/StatsBar"
 import Toolbar from "./components/Toolbar"
 import FollowerGrid from "./components/FollowerGrid"
 import FollowerList from "./components/FollowerList"
 import FollowerModal from "./components/FollowerModal"
 import AddFollowerModal from "./components/AddFollowerModal"
+import PorterModal from "./components/PorterModal"
 
 export default function App() {
-  const { followers, saveFollower, addFollower, removeFollower } =
+  const { followers, setFollowers, saveFollower, addFollower, removeFollower } =
     useFollowers()
   const {
     filtered,
@@ -23,8 +25,11 @@ export default function App() {
     setView,
   } = useFilteredFollowers(followers)
 
+  const { exportData, importData } = usePorter(followers, setFollowers)
+
   const [selected, setSelected] = useState(null)
   const [adding, setAdding] = useState(false)
+  const [porting, setPorting] = useState(false)
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -32,12 +37,20 @@ export default function App() {
         <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
           Followers Manager
         </h1>
-        <button
-          onClick={() => setAdding(true)}
-          className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-        >
-          + Añadir
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setPorting(true)}
+            className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-100 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+          >
+            Export / Import
+          </button>
+          <button
+            onClick={() => setAdding(true)}
+            className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+          >
+            + Añadir
+          </button>
+        </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
@@ -80,6 +93,14 @@ export default function App() {
         <AddFollowerModal
           onClose={() => setAdding(false)}
           onAdd={addFollower}
+        />
+      )}
+
+      {porting && (
+        <PorterModal
+          onClose={() => setPorting(false)}
+          onExport={exportData}
+          onImport={importData}
         />
       )}
     </div>

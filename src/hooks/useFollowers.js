@@ -16,5 +16,5 @@ export function useFollowers() {
     setFollowers((prev) => prev.filter((f) => f.id !== id))
   }
 
-  return { followers, saveFollower, addFollower, removeFollower }
+  return { followers, setFollowers, saveFollower, addFollower, removeFollower }
 }
