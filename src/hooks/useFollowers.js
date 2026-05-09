@@ -1,8 +1,7 @@
-import { mockFollowers } from "../data/followers"
 import { useLocalStorage } from "./useLocalStorage"
 
 export function useFollowers() {
-  const [followers, setFollowers] = useLocalStorage("followers", mockFollowers)
+  const [followers, setFollowers] = useLocalStorage("followers", [])
 
   function saveFollower(updated) {
     setFollowers((prev) => prev.map((f) => (f.id === updated.id ? updated : f)))

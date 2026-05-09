@@ -9,6 +9,7 @@ import FollowerList from "./components/FollowerList"
 import FollowerModal from "./components/FollowerModal"
 import AddFollowerModal from "./components/AddFollowerModal"
 import PorterModal from "./components/PorterModal"
+import EmptyState from "./components/EmptyState"
 
 export default function App() {
   const { followers, setFollowers, saveFollower, addFollower, removeFollower } =
@@ -30,6 +31,9 @@ export default function App() {
   const [selected, setSelected] = useState(null)
   const [adding, setAdding] = useState(false)
   const [porting, setPorting] = useState(false)
+
+  const isEmpty = followers.length === 0
+  const noResults = !isEmpty && filtered.length === 0
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
@@ -54,31 +58,35 @@ export default function App() {
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
-        <StatsBar followers={followers} />
+        {!isEmpty && <StatsBar followers={followers} />}
 
-        <Toolbar
-          search={search}
-          onSearch={setSearch}
-          filter={filter}
-          onFilter={setFilter}
-          sort={sort}
-          onSort={setSort}
-          view={view}
-          onView={setView}
-          total={filtered.length}
-        />
+        {!isEmpty && (
+          <Toolbar
+            search={search}
+            onSearch={setSearch}
+            filter={filter}
+            onFilter={setFilter}
+            sort={sort}
+            onSort={setSort}
+            view={view}
+            onView={setView}
+            total={filtered.length}
+          />
+        )}
 
-        {view === "grid" && (
+        {!isEmpty && !noResults && view === "grid" && (
           <FollowerGrid followers={filtered} onSelect={setSelected} />
         )}
-        {view === "list" && (
+        {!isEmpty && !noResults && view === "list" && (
           <FollowerList followers={filtered} onSelect={setSelected} />
         )}
 
-        {filtered.length === 0 && (
-          <p className="text-center text-zinc-600 text-sm py-16">
-            Sin resultados
-          </p>
+        {(isEmpty || noResults) && (
+          <EmptyState
+            total={followers.length}
+            filtered={filtered.length}
+            onAdd={() => setAdding(true)}
+          />
         )}
       </main>
 
