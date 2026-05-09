@@ -101,6 +101,7 @@ export default function App() {
         <AddFollowerModal
           onClose={() => setAdding(false)}
           onAdd={addFollower}
+          followers={followers}
         />
       )}
 

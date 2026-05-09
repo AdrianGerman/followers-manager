@@ -3,7 +3,7 @@ import { ROLES } from "../data/followers"
 
 const EMPTY = { username: "", role: ROLES.FOLLOWER, notes: "", followedAt: "" }
 
-export default function AddFollowerModal({ onClose, onAdd }) {
+export default function AddFollowerModal({ onClose, onAdd, followers }) {
   const [form, setForm] = useState({
     ...EMPTY,
     followedAt: new Date().toISOString().slice(0, 10),
@@ -12,15 +12,26 @@ export default function AddFollowerModal({ onClose, onAdd }) {
 
   function set(field, value) {
     setForm((prev) => ({ ...prev, [field]: value }))
-    setError("")
+    if (field === "username") setError("")
+  }
+
+  function validate() {
+    if (!form.username.trim()) {
+      setError("El username es obligatorio")
+      return false
+    }
+    const exists = followers.some(
+      (f) => f.username.toLowerCase() === form.username.trim().toLowerCase(),
+    )
+    if (exists) {
+      setError("Este username ya existe en tu lista")
+      return false
+    }
+    return true
   }
 
   function handleAdd() {
-    if (!form.username.trim()) {
-      setError("El username es obligatorio")
-      return
-    }
-
+    if (!validate()) return
     onAdd({
       id: crypto.randomUUID(),
       username: form.username.trim(),
@@ -62,9 +73,13 @@ export default function AddFollowerModal({ onClose, onAdd }) {
               value={form.username}
               onChange={(e) => set("username", e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
+              className={`w-full bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors ${
+                error
+                  ? "border-red-500 focus:border-red-400"
+                  : "border-zinc-700 focus:border-violet-500"
+              }`}
             />
-            {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+            {error && <p className="text-xs text-red-400 mt-0.5">{error}</p>}
           </Field>
 
           <Field label="Rol">
