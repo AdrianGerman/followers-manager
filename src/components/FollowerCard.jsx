@@ -3,7 +3,7 @@ import { getSeniorityLabel } from "../utils"
 import Avatar from "./Avatar"
 
 export default function FollowerCard({ follower, onClick }) {
-  const { username, avatar, role, followedAt } = follower
+  const { username, avatar, role, followedAt, gameAliases } = follower
   const isMod = role === ROLES.MODERATOR
 
   return (
@@ -26,6 +26,12 @@ export default function FollowerCard({ follower, onClick }) {
       <p className="text-[11px] text-zinc-500">
         {getSeniorityLabel(followedAt)} siguiendo
       </p>
+
+      {gameAliases.length > 0 && (
+        <span className="text-[10px] text-violet-400 bg-violet-400/10 border border-violet-500/20 rounded-full px-2 py-0.5">
+          {gameAliases.length} {gameAliases.length === 1 ? "alias" : "aliases"}
+        </span>
+      )}
     </div>
   )
 }

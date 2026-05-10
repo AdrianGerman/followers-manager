@@ -19,12 +19,13 @@ export default function FollowerRow({ follower, onClick }) {
             {username}
           </span>
           <RoleBadge isMod={isMod} />
+          {gameAliases.length > 0 && (
+            <span className="text-[10px] text-violet-400 bg-violet-400/10 border border-violet-500/20 rounded-full px-2 py-0.5">
+              {gameAliases.length}{" "}
+              {gameAliases.length === 1 ? "alias" : "aliases"}
+            </span>
+          )}
         </div>
-        {gameAliases.length > 0 && (
-          <p className="text-[11px] text-zinc-500 mt-0.5 truncate">
-            {gameAliases.map((a) => `${a.game}: ${a.alias}`).join(" · ")}
-          </p>
-        )}
       </div>
 
       <div className="text-right shrink-0">
