@@ -1,7 +1,14 @@
 import { useState } from "react"
 import { ROLES } from "../data/followers"
+import Avatar from "./Avatar"
 
-const EMPTY = { username: "", role: ROLES.FOLLOWER, notes: "", followedAt: "" }
+const EMPTY = {
+  username: "",
+  role: ROLES.FOLLOWER,
+  notes: "",
+  followedAt: "",
+  avatar: "",
+}
 
 export default function AddFollowerModal({ onClose, onAdd, followers }) {
   const [form, setForm] = useState({
@@ -35,7 +42,7 @@ export default function AddFollowerModal({ onClose, onAdd, followers }) {
     onAdd({
       id: crypto.randomUUID(),
       username: form.username.trim(),
-      avatar: null,
+      avatar: form.avatar.trim() || null,
       role: form.role,
       followedAt: new Date(form.followedAt).toISOString(),
       notes: form.notes.trim(),
@@ -66,6 +73,23 @@ export default function AddFollowerModal({ onClose, onAdd, followers }) {
         </div>
 
         <div className="px-6 py-5 flex flex-col gap-4">
+          <Field label="Foto de perfil">
+            <div className="flex items-center gap-3">
+              <Avatar
+                username={form.username || "?"}
+                avatar={form.avatar.trim() || null}
+                size={48}
+              />
+              <input
+                type="text"
+                placeholder="URL de imagen (opcional)"
+                value={form.avatar}
+                onChange={(e) => set("avatar", e.target.value)}
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
+              />
+            </div>
+          </Field>
+
           <Field label="Username *">
             <input
               type="text"

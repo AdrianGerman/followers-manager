@@ -14,7 +14,7 @@ export default function FollowerModal({ follower, onClose, onSave, onRemove }) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="hide-scrollbar bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto"
+        className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md overflow-hidden max-h-[90vh] overflow-y-auto"
       >
         <ModalContent
           follower={follower}
@@ -33,25 +33,34 @@ function ModalContent({ follower, onClose, onSave, onRemove }) {
 
   const [role, setRole] = useState(follower.role)
   const [notes, setNotes] = useState(follower.notes)
+  const [avatar, setAvatar] = useState(follower.avatar || "")
   const [aliases, setAliases] = useState(follower.gameAliases)
   const [newAlias, setNewAlias] = useState({ game: "", alias: "" })
 
-  const { username, avatar, followedAt } = follower
+  const { username, followedAt } = follower
   const isMod = role === ROLES.MODERATOR
 
   const isDirty =
     role !== follower.role ||
     notes !== follower.notes ||
+    (avatar.trim() || null) !== follower.avatar ||
     JSON.stringify(aliases) !== JSON.stringify(follower.gameAliases)
 
   function handleSave() {
-    onSave({ ...follower, role, notes, gameAliases: aliases })
+    onSave({
+      ...follower,
+      role,
+      notes,
+      avatar: avatar.trim() || null,
+      gameAliases: aliases,
+    })
     setEditing(false)
   }
 
   function handleCancel() {
     setRole(follower.role)
     setNotes(follower.notes)
+    setAvatar(follower.avatar || "")
     setAliases(follower.gameAliases)
     setNewAlias({ game: "", alias: "" })
     setEditing(false)
@@ -75,12 +84,13 @@ function ModalContent({ follower, onClose, onSave, onRemove }) {
     onClose()
   }
 
+  const previewAvatar = avatar.trim() || null
+
   return (
     <>
-      {/* Banner + avatar */}
       <div className="relative bg-zinc-800 h-20">
         <div className="absolute bottom-0 left-6 translate-y-1/2">
-          <Avatar username={username} avatar={avatar} size={72} />
+          <Avatar username={username} avatar={previewAvatar} size={72} />
         </div>
         <div className="absolute top-3 right-3 flex gap-2">
           {!editing && (
@@ -113,6 +123,22 @@ function ModalContent({ follower, onClose, onSave, onRemove }) {
         </div>
 
         <Divider />
+
+        {editing && (
+          <>
+            <div>
+              <Label>Foto de perfil</Label>
+              <input
+                type="text"
+                placeholder="URL de imagen (opcional)"
+                value={avatar}
+                onChange={(e) => setAvatar(e.target.value)}
+                className="mt-2 w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
+              />
+            </div>
+            <Divider />
+          </>
+        )}
 
         <div>
           <Label>Rol</Label>
