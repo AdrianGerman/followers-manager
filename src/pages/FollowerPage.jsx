@@ -1,0 +1,361 @@
+import { useState } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import { useFollowers } from "../hooks/useFollowers"
+import { formatDate, getSeniorityLabel } from "../utils"
+import { ROLES } from "../data/followers"
+import Avatar from "../components/Avatar"
+import { RoleBadge } from "../components/FollowerRow"
+
+export default function FollowerPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const { followers, saveFollower, removeFollower } = useFollowers()
+
+  const follower = followers.find((f) => f.id === id)
+
+  if (!follower) {
+    return (
+      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center gap-4">
+        <p className="text-zinc-500 text-sm">Seguidor no encontrado</p>
+        <button
+          onClick={() => navigate("/")}
+          className="text-violet-400 hover:text-violet-300 text-sm cursor-pointer"
+        >
+          ← Volver
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+      <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-900 px-6 h-14 flex items-center gap-4">
+        <button
+          onClick={() => navigate("/")}
+          className="text-zinc-500 hover:text-zinc-100 text-sm transition-colors cursor-pointer flex items-center gap-1.5"
+        >
+          ← Volver
+        </button>
+        <span className="text-zinc-700">|</span>
+        <span className="text-sm text-zinc-400 truncate">
+          {follower.username}
+        </span>
+      </header>
+
+      <main className="max-w-2xl mx-auto px-6 py-10">
+        <FollowerDetail
+          follower={follower}
+          onSave={(updated) => {
+            saveFollower(updated)
+            navigate("/")
+          }}
+          onRemove={(id) => {
+            removeFollower(id)
+            navigate("/")
+          }}
+        />
+      </main>
+    </div>
+  )
+}
+
+function FollowerDetail({ follower, onSave, onRemove }) {
+  const [editing, setEditing] = useState(false)
+  const [confirming, setConfirming] = useState(false)
+
+  const [role, setRole] = useState(follower.role)
+  const [notes, setNotes] = useState(follower.notes)
+  const [avatar, setAvatar] = useState(follower.avatar || "")
+  const [aliases, setAliases] = useState(follower.gameAliases)
+  const [newAlias, setNewAlias] = useState({ game: "", alias: "" })
+
+  const { username, followedAt } = follower
+  const isMod = role === ROLES.MODERATOR
+
+  const isDirty =
+    role !== follower.role ||
+    notes !== follower.notes ||
+    (avatar.trim() || null) !== follower.avatar ||
+    JSON.stringify(aliases) !== JSON.stringify(follower.gameAliases)
+
+  function handleSave() {
+    onSave({
+      ...follower,
+      role,
+      notes,
+      avatar: avatar.trim() || null,
+      gameAliases: aliases,
+    })
+  }
+
+  function handleCancel() {
+    setRole(follower.role)
+    setNotes(follower.notes)
+    setAvatar(follower.avatar || "")
+    setAliases(follower.gameAliases)
+    setNewAlias({ game: "", alias: "" })
+    setEditing(false)
+  }
+
+  function addAlias() {
+    if (!newAlias.game.trim() || !newAlias.alias.trim()) return
+    setAliases([
+      ...aliases,
+      { game: newAlias.game.trim(), alias: newAlias.alias.trim() },
+    ])
+    setNewAlias({ game: "", alias: "" })
+  }
+
+  function removeAlias(i) {
+    setAliases(aliases.filter((_, idx) => idx !== i))
+  }
+
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+      <div className="relative bg-zinc-800 h-28">
+        <div className="absolute bottom-0 left-8 translate-y-1/2">
+          <Avatar
+            username={username}
+            avatar={avatar.trim() || null}
+            size={88}
+          />
+        </div>
+        {!editing && (
+          <button
+            onClick={() => setEditing(true)}
+            className="absolute top-4 right-4 px-3 py-1.5 text-xs font-medium bg-zinc-700 hover:bg-zinc-600 text-zinc-300 hover:text-white rounded-lg transition-colors cursor-pointer"
+          >
+            Editar
+          </button>
+        )}
+      </div>
+
+      <div className="px-8 pt-14 pb-8 flex flex-col gap-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-100">{username}</h1>
+            <p className="text-sm text-zinc-500 mt-1">
+              Desde {formatDate(followedAt)} · {getSeniorityLabel(followedAt)}{" "}
+              siguiendo
+            </p>
+          </div>
+          <RoleBadge isMod={isMod} />
+        </div>
+
+        <Divider />
+
+        {editing && (
+          <>
+            <Section label="Foto de perfil">
+              <input
+                type="text"
+                placeholder="URL de imagen (opcional)"
+                value={avatar}
+                onChange={(e) => setAvatar(e.target.value)}
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
+              />
+            </Section>
+            <Divider />
+          </>
+        )}
+
+        <Section label="Rol">
+          {editing ? (
+            <div className="flex gap-2">
+              <RoleBtn
+                active={role === ROLES.FOLLOWER}
+                onClick={() => setRole(ROLES.FOLLOWER)}
+                label="Seguidor"
+              />
+              <RoleBtn
+                active={role === ROLES.MODERATOR}
+                onClick={() => setRole(ROLES.MODERATOR)}
+                label="Moderador"
+                mod
+              />
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-300">
+              {isMod ? "Moderador" : "Seguidor"}
+            </p>
+          )}
+        </Section>
+
+        <Divider />
+
+        {/* Notas */}
+        <Section label="Notas">
+          {editing ? (
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="¿Por qué añadiste a este seguidor?"
+              rows={4}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors resize-none"
+            />
+          ) : (
+            <p
+              className={`text-sm ${notes ? "text-zinc-300" : "text-zinc-600 italic"}`}
+            >
+              {notes || "Sin notas"}
+            </p>
+          )}
+        </Section>
+
+        <Divider />
+
+        <Section label="Alias en juegos">
+          {aliases.length > 0 ? (
+            <ul className="flex flex-col gap-2">
+              {aliases.map((a, i) => (
+                <li
+                  key={i}
+                  className="flex items-center justify-between bg-zinc-800 rounded-lg px-4 py-2.5 text-sm"
+                >
+                  <span className="text-zinc-500 text-xs w-1/3">{a.game}</span>
+                  <span className="text-zinc-200 font-medium">{a.alias}</span>
+                  {editing && (
+                    <button
+                      onClick={() => removeAlias(i)}
+                      className="text-zinc-600 hover:text-red-400 transition-colors text-xs ml-4 cursor-pointer"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-zinc-600 italic">
+              Sin aliases registrados
+            </p>
+          )}
+
+          {editing && (
+            <div className="flex gap-2 mt-3">
+              <input
+                type="text"
+                placeholder="Juego"
+                value={newAlias.game}
+                onChange={(e) =>
+                  setNewAlias({ ...newAlias, game: e.target.value })
+                }
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
+              />
+              <input
+                type="text"
+                placeholder="Alias"
+                value={newAlias.alias}
+                onChange={(e) =>
+                  setNewAlias({ ...newAlias, alias: e.target.value })
+                }
+                onKeyDown={(e) => e.key === "Enter" && addAlias()}
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500 transition-colors"
+              />
+              <button
+                onClick={addAlias}
+                className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white text-sm rounded-lg transition-colors cursor-pointer font-medium"
+              >
+                +
+              </button>
+            </div>
+          )}
+        </Section>
+
+        {editing && (
+          <>
+            <Divider />
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancel}
+                className="flex-1 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-100 text-sm font-medium transition-colors cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={!isDirty}
+                className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                  isDirty
+                    ? "bg-violet-600 hover:bg-violet-500 text-white cursor-pointer"
+                    : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+                }`}
+              >
+                Guardar
+              </button>
+            </div>
+          </>
+        )}
+
+        {/* Eliminar */}
+        {!editing && (
+          <>
+            <Divider />
+            {confirming ? (
+              <div className="flex flex-col gap-3">
+                <p className="text-sm text-zinc-500 text-center">
+                  ¿Eliminar a{" "}
+                  <span className="text-zinc-300 font-medium">{username}</span>?
+                  Esto no se puede deshacer.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setConfirming(false)}
+                    className="flex-1 py-2.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-100 text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => onRemove(follower.id)}
+                    className="flex-1 py-2.5 rounded-lg bg-red-600 hover:bg-red-500 text-white text-sm font-medium transition-colors cursor-pointer"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirming(true)}
+                className="w-full py-2.5 rounded-lg bg-transparent hover:bg-red-500/10 border border-zinc-800 hover:border-red-500/40 text-zinc-600 hover:text-red-400 text-sm font-medium transition-colors cursor-pointer"
+              >
+                Eliminar seguidor
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Section({ label, children }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-[11px] text-zinc-500 uppercase tracking-widest">
+        {label}
+      </p>
+      {children}
+    </div>
+  )
+}
+
+function Divider() {
+  return <hr className="border-zinc-800" />
+}
+
+function RoleBtn({ active, onClick, label, mod = false }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 py-2 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
+        active
+          ? mod
+            ? "bg-yellow-400/10 border-yellow-500/60 text-yellow-400"
+            : "bg-zinc-700 border-zinc-600 text-zinc-100"
+          : "bg-transparent border-zinc-700 text-zinc-500 hover:text-zinc-300"
+      }`}
+    >
+      {label}
+    </button>
+  )
+}
