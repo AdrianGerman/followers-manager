@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useFollowers } from "../hooks/useFollowers"
 import FollowerDetail from "../components/follower/FollowerDetail"
 import FollowerEditForm from "../components/follower/FollowerEditForm"
+import NotFoundPage from "./NotFoundPage"
 
 export default function FollowerPage() {
   const { id } = useParams()
@@ -12,19 +13,7 @@ export default function FollowerPage() {
 
   const follower = followers.find((f) => f.id === id)
 
-  if (!follower) {
-    return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center gap-3">
-        <p className="text-zinc-500 text-sm">Seguidor no encontrado</p>
-        <button
-          onClick={() => navigate("/")}
-          className="text-violet-400 hover:text-violet-300 text-sm cursor-pointer"
-        >
-          ← Volver
-        </button>
-      </div>
-    )
-  }
+  if (!follower) return <NotFoundPage />
 
   function handleSave(updated) {
     saveFollower(updated)
