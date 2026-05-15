@@ -3,10 +3,12 @@ import { formatDate, getSeniorityLabel } from "../../utils"
 import { ROLES } from "../../data/followers"
 import Avatar from "../Avatar"
 import { RoleBadge } from "../FollowerRow"
+import FollowerHistory from "./FollowerHistory"
 
 export default function FollowerDetail({ follower, onRemove }) {
   const [confirming, setConfirming] = useState(false)
-  const { username, avatar, role, followedAt, notes, gameAliases } = follower
+  const { username, avatar, role, followedAt, notes, gameAliases, history } =
+    follower
   const isMod = role === ROLES.MODERATOR
 
   return (
@@ -103,6 +105,8 @@ export default function FollowerDetail({ follower, onRemove }) {
             </p>
           )}
         </div>
+
+        <FollowerHistory history={history} />
       </div>
     </div>
   )
