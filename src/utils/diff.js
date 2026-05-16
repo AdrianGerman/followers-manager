@@ -33,5 +33,17 @@ export function buildChangelog(prev, next) {
     else changes.push("Aliases actualizados")
   }
 
+  const prevTags = JSON.stringify([...(prev.tags || [])].sort())
+  const nextTags = JSON.stringify([...(next.tags || [])].sort())
+  if (prevTags !== nextTags) {
+    const diff = (next.tags || []).length - (prev.tags || []).length
+    if (diff > 0) changes.push(`${diff} tag añadido${diff > 1 ? "s" : ""}`)
+    else if (diff < 0)
+      changes.push(
+        `${Math.abs(diff)} tag eliminado${Math.abs(diff) > 1 ? "s" : ""}`,
+      )
+    else changes.push("Tags actualizados")
+  }
+
   return changes
 }
