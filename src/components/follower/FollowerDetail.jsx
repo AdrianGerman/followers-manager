@@ -4,11 +4,20 @@ import { ROLES } from "../../data/followers"
 import Avatar from "../Avatar"
 import { RoleBadge } from "../FollowerRow"
 import FollowerHistory from "./FollowerHistory"
+import FollowerTags from "./FollowerTags"
 
 export default function FollowerDetail({ follower, onRemove }) {
   const [confirming, setConfirming] = useState(false)
-  const { username, avatar, role, followedAt, notes, gameAliases, history } =
-    follower
+  const {
+    username,
+    avatar,
+    role,
+    followedAt,
+    notes,
+    gameAliases,
+    history,
+    tags,
+  } = follower
   const isMod = role === ROLES.MODERATOR
 
   return (
@@ -30,6 +39,8 @@ export default function FollowerDetail({ follower, onRemove }) {
             <p className="text-sm text-zinc-300">{formatDate(followedAt)}</p>
           </div>
         </div>
+
+        <FollowerTags tags={tags} />
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
           {confirming ? (

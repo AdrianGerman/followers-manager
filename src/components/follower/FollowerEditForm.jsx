@@ -2,19 +2,22 @@ import { useState } from "react"
 import { ROLES } from "../../data/followers"
 import { buildChangelog } from "../../utils/diff"
 import Avatar from "../Avatar"
+import FollowerTagsEditor from "./FollowerTagsEditor"
 
 export default function FollowerEditForm({ follower, onSave, onCancel }) {
   const [role, setRole] = useState(follower.role)
   const [notes, setNotes] = useState(follower.notes)
   const [avatar, setAvatar] = useState(follower.avatar || "")
   const [aliases, setAliases] = useState(follower.gameAliases)
+  const [tags, setTags] = useState(follower.tags || [])
   const [newAlias, setNewAlias] = useState({ game: "", alias: "" })
 
   const isDirty =
     role !== follower.role ||
     notes !== follower.notes ||
     (avatar.trim() || null) !== follower.avatar ||
-    JSON.stringify(aliases) !== JSON.stringify(follower.gameAliases)
+    JSON.stringify(aliases) !== JSON.stringify(follower.gameAliases) ||
+    JSON.stringify(tags) !== JSON.stringify(follower.tags || [])
 
   function handleSave() {
     const updated = {
@@ -23,10 +26,10 @@ export default function FollowerEditForm({ follower, onSave, onCancel }) {
       notes,
       avatar: avatar.trim() || null,
       gameAliases: aliases,
+      tags,
     }
 
     const changes = buildChangelog(follower, updated)
-
     if (changes.length > 0) {
       updated.history = [
         ...(follower.history || []),
@@ -123,6 +126,12 @@ export default function FollowerEditForm({ follower, onSave, onCancel }) {
         </div>
 
         <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+          <Field label="Tags">
+            <FollowerTagsEditor tags={tags} onChange={setTags} />
+          </Field>
+        </div>
+
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
           <Field label="Alias en juegos">
             {aliases.length > 0 && (
               <ul className="flex flex-col gap-2 mb-4">
@@ -183,7 +192,7 @@ export default function FollowerEditForm({ follower, onSave, onCancel }) {
 
 function Field({ label, children }) {
   return (
-    <div className="flex flex-col gap-1.5 w-full">
+    <div className="flex flex-col gap-2 w-full">
       <p className="text-[11px] text-zinc-500 uppercase tracking-widest">
         {label}
       </p>
