@@ -38,24 +38,26 @@ export default function HomePage() {
   return (
     <PageTransition>
       <div className="min-h-screen bg-zinc-950 text-zinc-100">
-        <header className="sticky top-0 z-10 border-b border-zinc-800 bg-zinc-900 px-6 h-14 flex items-center justify-between">
-          <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
-            Followers Manager
-          </h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setPorting(true)}
-              className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-100 text-xs font-medium rounded-lg transition-colors cursor-pointer"
-            >
-              Export / Import
-            </button>
-            <button
-              onClick={() => setAdding(true)}
-              className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-            >
-              + Añadir
-            </button>
-          </div>
+        <header className="top-0 z-10 border-b border-zinc-800 bg-zinc-900 px-6 h-14 flex">
+          <section className="max-w-6xl mx-auto flex items-center justify-between w-full">
+            <h1 className="font-bold text-lg tracking-widest text-violet-400 uppercase">
+              Followers Manager
+            </h1>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPorting(true)}
+                className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-zinc-100 text-xs font-medium rounded-lg transition-colors cursor-pointer"
+              >
+                Export / Import
+              </button>
+              <button
+                onClick={() => setAdding(true)}
+                className="px-4 py-1.5 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+              >
+                + Añadir
+              </button>
+            </div>
+          </section>
         </header>
 
         <main className="max-w-6xl mx-auto px-6 py-8">
