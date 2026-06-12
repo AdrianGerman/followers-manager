@@ -25,3 +25,5 @@ export function getAvatarColor(username) {
   }
   return palette[Math.abs(hash) % palette.length]
 }
+
+export { todayLocal } from "./utils/date"

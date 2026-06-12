@@ -34,3 +34,11 @@ export function getSeniorityLabel(isoDate) {
   if (months >= 1) return `${months} ${months === 1 ? "mes" : "meses"}`
   return `${days} ${days === 1 ? "día" : "días"}`
 }
+
+export function todayLocal() {
+  const d = new Date()
+  const year = d.getFullYear()
+  const month = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
