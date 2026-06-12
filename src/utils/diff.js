@@ -15,6 +15,12 @@ export function buildChangelog(prev, next) {
     else changes.push("Foto de perfil actualizada")
   }
 
+  const prevDate = prev.followedAt?.slice(0, 10)
+  const nextDate = next.followedAt?.slice(0, 10)
+  if (prevDate !== nextDate) {
+    changes.push(`Fecha de follow actualizada`)
+  }
+
   if (prev.notes !== next.notes) {
     if (!prev.notes && next.notes) changes.push("Notas añadidas")
     else if (prev.notes && !next.notes) changes.push("Notas eliminadas")

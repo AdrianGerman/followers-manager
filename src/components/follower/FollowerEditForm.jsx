@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { ROLES } from "../../data/followers"
 import { buildChangelog } from "../../utils/diff"
+import { parseDateLocal, toDateInput } from "../../utils"
 import Avatar from "../Avatar"
 import FollowerTagsEditor from "./FollowerTagsEditor"
 
@@ -10,12 +11,14 @@ export default function FollowerEditForm({ follower, onSave, onCancel }) {
   const [avatar, setAvatar] = useState(follower.avatar || "")
   const [aliases, setAliases] = useState(follower.gameAliases)
   const [tags, setTags] = useState(follower.tags || [])
+  const [followedAt, setFollowedAt] = useState(toDateInput(follower.followedAt))
   const [newAlias, setNewAlias] = useState({ game: "", alias: "" })
 
   const isDirty =
     role !== follower.role ||
     notes !== follower.notes ||
     (avatar.trim() || null) !== follower.avatar ||
+    parseDateLocal(followedAt) !== follower.followedAt ||
     JSON.stringify(aliases) !== JSON.stringify(follower.gameAliases) ||
     JSON.stringify(tags) !== JSON.stringify(follower.tags || [])
 
@@ -25,6 +28,7 @@ export default function FollowerEditForm({ follower, onSave, onCancel }) {
       role,
       notes,
       avatar: avatar.trim() || null,
+      followedAt: parseDateLocal(followedAt),
       gameAliases: aliases,
       tags,
     }
@@ -88,6 +92,15 @@ export default function FollowerEditForm({ follower, onSave, onCancel }) {
                 mod
               />
             </div>
+          </Field>
+
+          <Field label="Fecha de follow">
+            <input
+              type="date"
+              value={followedAt}
+              onChange={(e) => setFollowedAt(e.target.value)}
+              className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2 text-xs text-zinc-100 outline-none focus:border-violet-500 transition-colors"
+            />
           </Field>
         </div>
 
