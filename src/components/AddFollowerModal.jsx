@@ -1,19 +1,17 @@
 import { useState } from "react"
 import { ROLES } from "../data/followers"
+import { parseDateLocal, todayLocal } from "../utils"
 import Avatar from "./Avatar"
 
-const EMPTY = {
-  username: "",
-  role: ROLES.FOLLOWER,
-  notes: "",
-  followedAt: "",
-  avatar: "",
-}
+const today = todayLocal()
 
 export default function AddFollowerModal({ onClose, onAdd, followers }) {
   const [form, setForm] = useState({
-    ...EMPTY,
-    followedAt: new Date().toISOString().slice(0, 10),
+    username: "",
+    role: ROLES.FOLLOWER,
+    notes: "",
+    followedAt: today,
+    avatar: "",
   })
   const [error, setError] = useState("")
 
@@ -44,9 +42,11 @@ export default function AddFollowerModal({ onClose, onAdd, followers }) {
       username: form.username.trim(),
       avatar: form.avatar.trim() || null,
       role: form.role,
-      followedAt: new Date(form.followedAt).toISOString(),
+      followedAt: parseDateLocal(form.followedAt),
       notes: form.notes.trim(),
       gameAliases: [],
+      tags: [],
+      history: [],
     })
     onClose()
   }
@@ -78,7 +78,7 @@ export default function AddFollowerModal({ onClose, onAdd, followers }) {
               <Avatar
                 username={form.username || "?"}
                 avatar={form.avatar.trim() || null}
-                size={48}
+                size={40}
               />
               <input
                 type="text"
@@ -99,11 +99,11 @@ export default function AddFollowerModal({ onClose, onAdd, followers }) {
               onKeyDown={(e) => e.key === "Enter" && handleAdd()}
               className={`w-full bg-zinc-800 border rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none transition-colors ${
                 error
-                  ? "border-red-500 focus:border-red-400"
+                  ? "border-red-500"
                   : "border-zinc-700 focus:border-violet-500"
               }`}
             />
-            {error && <p className="text-xs text-red-400 mt-0.5">{error}</p>}
+            {error && <p className="text-xs text-red-400">{error}</p>}
           </Field>
 
           <Field label="Rol">
