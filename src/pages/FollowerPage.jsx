@@ -58,7 +58,11 @@ export default function FollowerPage() {
               onCancel={() => setEditing(false)}
             />
           ) : (
-            <FollowerDetail follower={follower} onRemove={handleRemove} />
+            <FollowerDetail
+              follower={follower}
+              onRemove={handleRemove}
+              onSave={saveFollower}
+            />
           )}
         </main>
       </div>
