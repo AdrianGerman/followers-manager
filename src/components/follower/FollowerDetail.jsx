@@ -6,7 +6,7 @@ import { RoleBadge } from "../FollowerRow"
 import FollowerHistory from "./FollowerHistory"
 import FollowerTags from "./FollowerTags"
 
-export default function FollowerDetail({ follower, onRemove }) {
+export default function FollowerDetail({ follower, onRemove, onSave }) {
   const [confirming, setConfirming] = useState(false)
   const {
     username,
@@ -19,6 +19,10 @@ export default function FollowerDetail({ follower, onRemove }) {
     tags,
   } = follower
   const isMod = role === ROLES.MODERATOR
+
+  function handleHistoryUpdate(updatedHistory) {
+    onSave({ ...follower, history: updatedHistory })
+  }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -117,7 +121,7 @@ export default function FollowerDetail({ follower, onRemove }) {
           )}
         </div>
 
-        <FollowerHistory history={history} />
+        <FollowerHistory history={history} onUpdate={handleHistoryUpdate} />
       </div>
     </div>
   )
